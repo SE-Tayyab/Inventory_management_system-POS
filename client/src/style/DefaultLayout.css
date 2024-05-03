@@ -1,0 +1,17 @@
+.header-content{
+    height: 100%;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin: auto;
+}
+
+.header-content .header-cart-icon{
+    display: flex;
+    align-items: center;
+}
+
+.header-content .header-cart-icon .icon{
+    font-size: 20px;
+  }
