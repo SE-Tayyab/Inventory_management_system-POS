@@ -23,6 +23,7 @@ app.use(morgan("dev"));
 //routes
 //Method get
 app.use("/api/items", require("./routes/itemRoutes"));
+app.use("/api/categories", require("./routes/categoryRoutes"));
 
 const PORT = process.env.PORT || 5000;
 

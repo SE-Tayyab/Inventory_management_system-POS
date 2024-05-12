@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import Loading from './Loading';
-import '../style/DefaultLayout.css'
-
+import React, { useEffect, useState } from "react";
+import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import Spinner from "./Spinner.js";
+import "../style/DefaultLayout.css";
 
 import {
   ShoppingCartOutlined,
@@ -12,8 +11,8 @@ import {
   UnorderedListOutlined,
   CopyOutlined,
   UserOutlined,
-  LogoutOutlined
-} from '@ant-design/icons';
+  LogoutOutlined,
+} from "@ant-design/icons";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -28,15 +27,27 @@ function getItem(label, key, icon, children, link) {
 }
 
 const items = [
-  getItem('Home', '/', <HomeOutlined />, undefined, '/'),
-  getItem('Inventory', '/inventory', <UnorderedListOutlined />, [
-    getItem('Items', '/items', undefined, undefined, '/items'),
-    getItem('AddItems', '/items2', undefined, undefined, '/items'),
-    getItem('DeleteItems', '/items3', undefined, undefined, '/items'),
-  ], ''),
-  getItem('Bills', '/bills', <CopyOutlined />, undefined, '/bills'),
-  getItem('Customers', '/customers', <UserOutlined />, undefined, '/customers'),
-  getItem('Logout', '/logout', <LogoutOutlined />),
+  getItem("Home", "/", <HomeOutlined />, undefined, "/"),
+  getItem(
+    "Inventory",
+    "/inventory",
+    <UnorderedListOutlined />,
+    [
+      getItem("Items", "/items", undefined, undefined, "/items"),
+      getItem("Add Items", "/add-item", undefined, undefined, "/add-item"),
+      getItem(
+        "Add Categories",
+        "/add-categories",
+        undefined,
+        undefined,
+        "/add-categories"
+      ),
+    ],
+    ""
+  ),
+  getItem("Bills", "/bills", <CopyOutlined />, undefined, "/bills"),
+  getItem("Customers", "/customers", <UserOutlined />, undefined, "/customers"),
+  getItem("Logout", "/logout", <LogoutOutlined />),
 ];
 
 const renderMenuItem = (item) => {
@@ -56,14 +67,14 @@ const renderMenuItem = (item) => {
 };
 
 const App = ({ children }) => {
-  const { cartItems} = useSelector(state => state.rootReducer);
+  const { cartItems, loading } = useSelector((state) => state.rootReducer);
   const [collapsed, setCollapsed] = useState(false);
   const [hover, setHover] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-  }, [cartItems])
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -73,13 +84,22 @@ const App = ({ children }) => {
   return (
     <Layout
       style={{
-        minHeight: '100vh',
+        minHeight: "100vh",
       }}
     >
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+      {loading && <Spinner />}
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+      >
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={[location.pathname]} mode="inline">
-          {items.map((item) => renderMenuItem(item))}   
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={[location.pathname]}
+          mode="inline"
+        >
+          {items.map((item) => renderMenuItem(item))}
         </Menu>
       </Sider>
       <Layout>
@@ -88,38 +108,39 @@ const App = ({ children }) => {
             padding: 0,
             background: colorBgContainer,
           }}
-
         >
-        <div className='header-content'>
-        <div
-            className='header-cart-icon'
-            onClick={() => navigate('/salesorders')}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            style={{
-              cursor: hover ? 'pointer' : 'default',
-              color: hover ? '#007bff' : ''
-            }}
-          >
-            <div className='icon'>
-              <ShoppingCartOutlined />
+          <div className="header-content">
+            <div
+              className="header-cart-icon"
+              onClick={() => navigate("/salesorders")}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              style={{
+                cursor: hover ? "pointer" : "default",
+                color: hover ? "#007bff" : "",
+              }}
+            >
+              <div className="icon">
+                <ShoppingCartOutlined />
+              </div>
+              <p style={{ color: hover ? "#007bff" : "" }}>
+                {cartItems.length}
+              </p>
             </div>
-            <p style={{ color: hover ? '#007bff' : '' }}>{cartItems.length}</p>
           </div>
-        </div>
         </Header>
         <Content
           style={{
-            margin: '0 16px',
+            margin: "0 16px",
           }}
         >
           <Breadcrumb
             style={{
-              margin: '16px 0',
+              margin: "16px 0",
             }}
           >
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            {/* <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
           </Breadcrumb>
           <div
             style={{
@@ -134,10 +155,10 @@ const App = ({ children }) => {
         </Content>
         <Footer
           style={{
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          POS ©{new Date().getFullYear()} Created by Tayyab&Umar
         </Footer>
       </Layout>
     </Layout>

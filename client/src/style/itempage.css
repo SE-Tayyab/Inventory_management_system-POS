@@ -1,49 +1,35 @@
 .item-list-item {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-  }
-  
-  .item-list-item .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .item-list-item .ImageDiv {
-    flex-shrink: 0; /* Prevent image from shrinking */
-  }
-  
-  .item-list-item .item-title {
-    margin-bottom: 5px;
-  }
-  
-  .item-list-item .item-category {
-    margin-bottom: 10px;
-    font-style: italic;
-  }
-  
-  .item-list-item p {
-    margin: 0;
-  }
-  
-  .item-list-item .fw-bold {
-    font-weight: bold;
-  }
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+}
 
-  .button button {
-    border: none;
-    border-radius: 50px;
-    background-color: #1677FF; /* Button background color */
-    color: white; /* Button text color */
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition for background color change */
-  }
-  
-  .button button:hover {
-    background-color: #1050aa; /* Button background color on hover */
-  }
-  
+.item-list-item .content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-list-item .ImageDiv {
+  flex-shrink: 0; /* Prevent image from shrinking */
+}
+
+.item-list-item .item-title {
+  margin-bottom: 5px;
+}
+
+.item-list-item .item-category {
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.item-list-item p {
+  margin: 0;
+}
+
+.item-list-item .fw-bold {
+  font-weight: bold;
+}
+
+.editButton:hover {
+  background-color: #1050aa;
+}

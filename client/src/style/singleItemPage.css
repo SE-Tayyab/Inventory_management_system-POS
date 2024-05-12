@@ -1,0 +1,40 @@
+.item-details {
+  margin: 1vw;
+}
+
+.add-info {
+  display: flex;
+}
+
+.table {
+  width: 50%;
+}
+
+.image {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  width: 50%;
+}
+
+.item-table {
+  width: 50%;
+  border-collapse: collapse;
+}
+
+.item-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ffffff;
+}
+
+.item-table .attribute {
+  font-weight: bold;
+  color: #777;
+  border: none;
+}
+.item-image {
+  height: 20vw;
+  width: 20vw;
+  object-fit: cover;
+  border-radius: 10px;
+}
