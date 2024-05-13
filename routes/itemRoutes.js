@@ -1,4 +1,6 @@
 const express = require("express");
+const multerUpload = require("../middlewares/multer.middleware.js");
+
 const {
   getItemController,
   getSingleItemController,
@@ -10,9 +12,13 @@ const {
 const router = express.Router();
 
 // Routes
+router.post(
+  "/add-item",
+  multerUpload.fields([{ name: "image", maxCount: 1 }]),
+  addItemController
+);
 router.get("/get-item", getItemController);
 router.get("/get-item/:itemId", getSingleItemController);
-router.post("/add-item", addItemController);
 router.put("/edit-item/:itemId", editItemController);
 router.post("/get-item/delete-item", deleteItemController);
 

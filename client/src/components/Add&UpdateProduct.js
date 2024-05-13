@@ -5,13 +5,12 @@ import { message } from "antd";
 
 function AddProduct({ item }) {
   const [categories, setCategories] = useState([]);
-
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     quantity: "",
     category: "",
-    image: "",
+    image: null, // Changed from empty string to null
   });
 
   useEffect(() => {
@@ -23,7 +22,7 @@ function AddProduct({ item }) {
         price: "",
         quantity: "",
         category: "",
-        image: "",
+        image: null, // Changed from empty string to null
       });
     }
   }, [item]);
@@ -45,14 +44,24 @@ function AddProduct({ item }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("price", formData.price);
+      formDataToSend.append("quantity", formData.quantity);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("image", formData.image);
+
       if (item) {
         await axios.put(
           `http://localhost:5000/api/items/edit-item/${item._id}`,
-          formData
+          formDataToSend
         );
         message.success("Item Updated Successfully");
       } else {
-        await axios.post("http://localhost:5000/api/items/add-item", formData);
+        await axios.post(
+          "http://localhost:5000/api/items/add-item",
+          formDataToSend
+        );
         message.success("Item Added Successfully");
       }
     } catch (error) {
@@ -61,8 +70,10 @@ function AddProduct({ item }) {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, files } = e.target;
+    // If it's a file input, set the file object
+    const newValue = name === "image" ? files[0] : value;
+    setFormData({ ...formData, [name]: newValue });
   };
 
   return (
@@ -145,18 +156,18 @@ function AddProduct({ item }) {
           </select>
         </div>
 
-        {/* Image URL */}
+        {/* Image Upload */}
         <div className="mb-3">
           <label htmlFor="image" className="form-label">
-            Image URL
+            Image
           </label>
           <input
-            type="text"
+            type="file"
             className="form-control"
             id="image"
             name="image"
-            value={formData.image}
             onChange={handleChange}
+            required={!item} // Required only when adding a new item
           />
         </div>
 

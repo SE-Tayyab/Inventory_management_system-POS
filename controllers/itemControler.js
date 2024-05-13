@@ -1,4 +1,46 @@
 const itemModel = require("../models/itemModule");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
+
+// add items
+const addItemController = async (req, res) => {
+  try {
+    const { name, price, quantity, category } = req.body;
+    if (!name || !price || !quantity || !category) {
+      return res.status(400).send("Missing required fields in item data.");
+    }
+
+    let imageFilePath;
+    if (
+      req.files &&
+      Array.isArray(req.files.image) &&
+      req.files.image &&
+      req.files.image.length > 0
+    ) {
+      imageFilePath = req.files.image[0]?.path;
+    }
+
+    const image = imageFilePath ? await uploadOnCloudinary(imageFilePath) : "";
+
+    const newItem = await itemModel.create({
+      name,
+      price,
+      quantity,
+      category,
+      image: image.url,
+    });
+
+    await newItem.save();
+    const createdItem = await itemModel.findById(newItem._id);
+
+    return res.status(201).send({
+      message: "Item created successfully!",
+      createdItem,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal server error: " + error.message); // Return the actual error message for debugging
+  }
+};
 
 // get items
 const getItemController = async (req, res) => {
@@ -21,23 +63,6 @@ const getSingleItemController = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-// add items
-const addItemController = async (req, res) => {
-  try {
-    const { name, price, quantity, category, image } = req.body;
-    if (!name || !price || !quantity || !category) {
-      return res.status(400).send("Missing required fields in item data.");
-    }
-
-    const newItem = new itemModel(req.body);
-    await newItem.save();
-    res.status(201).send("Item created successfully!");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal server error");
   }
 };
 
