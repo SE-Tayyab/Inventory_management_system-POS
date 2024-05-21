@@ -13,6 +13,7 @@ import {
   UserOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import axios from "axios";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -25,6 +26,18 @@ function getItem(label, key, icon, children, link) {
     link,
   };
 }
+
+const handleLogout = async () => {
+  try {
+    const response = await axios.post("http://localhost:5000/api/user/logout");
+    if (response.status === 200) {
+    } else {
+      console.error("Logout failed: ", response.statusText);
+    }
+  } catch (error) {
+    console.error("Logout failed: ", error.message);
+  }
+};
 
 const items = [
   getItem("Home", "/", <HomeOutlined />, undefined, "/"),
@@ -51,19 +64,26 @@ const items = [
 ];
 
 const renderMenuItem = (item) => {
-  if (item.children) {
-    return (
-      <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
-        {item.children.map((childItem) => renderMenuItem(childItem))}
-      </Menu.SubMenu>
-    );
-  } else {
-    return (
-      <Menu.Item key={item.key} icon={item.icon}>
-        <Link to={item.link}>{item.label}</Link>
-      </Menu.Item>
-    );
-  }
+  const handleClick = () => {
+    // Check if the item is for Logout
+    if (item.label === "Logout") {
+      handleLogout(); // Call the logout function
+    } else {
+      // Redirect to the specified link
+      // useNavigate.navigate(item.link);
+      <Link to={item.link}></Link>;
+    }
+  };
+
+  return item.children ? (
+    <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
+      {item.children.map((childItem) => renderMenuItem(childItem))}
+    </Menu.SubMenu>
+  ) : (
+    <Menu.Item key={item.key} icon={item.icon} onClick={handleClick}>
+      <Link to={item.link}>{item.label}</Link>
+    </Menu.Item>
+  );
 };
 
 const App = ({ children }) => {

@@ -15,6 +15,11 @@ export const rootReducer = (state = initialState, action) => {
         ...state,
         loading: false,
       };
+    case "clear-cart":
+      return {
+        ...state,
+        cartItems: [],
+      };
     case "updateCart":
       const existingItemIndex = state.cartItems.findIndex(
         (item) => item._id === action.payload._id

@@ -7,6 +7,9 @@ import SingleItemPage from "./pages/SingleItemPage";
 import AddItem from "./pages/AddItem";
 import UpdateItem from "./pages/UpdateItem";
 import AddCategories from "./pages/AddCategories";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Bill from "./pages/Bill";
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
           <Route path="/add-item" element={<AddItem />} />
           <Route path="/edit-item/:itemId" element={<UpdateItem />} />
           <Route path="/add-categories" element={<AddCategories />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/bills" element={<Bill />} />
         </Routes>
       </BrowserRouter>
     </>
