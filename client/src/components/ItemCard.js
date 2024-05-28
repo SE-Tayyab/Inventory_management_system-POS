@@ -17,7 +17,7 @@ function ItemCard({ item }) {
     <Card
       hoverable
       style={{
-        width: 240,
+        width: 230,
       }}
       cover={
         <img

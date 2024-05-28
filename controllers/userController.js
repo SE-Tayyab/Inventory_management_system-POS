@@ -45,7 +45,7 @@ const register = async (req, res) => {
       .select("-password -refreshToken");
 
     return res
-      .status(200)
+      .status(201) // Change to 201 for successful creation
       .json({ message: "User created successfully.", user: createdUser });
   } catch (error) {
     return res
@@ -60,7 +60,7 @@ const login = async (req, res) => {
   if (!(email && password)) {
     return res
       .status(400)
-      .json({ message: "Please enter email and password both." });
+      .json({ message: "Please enter both email and password." });
   }
 
   try {
@@ -71,7 +71,7 @@ const login = async (req, res) => {
 
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Wrong email or password" });
+      return res.status(400).json({ message: "Wrong email or password." });
     }
 
     const { refreshToken, accessToken } =
@@ -82,8 +82,8 @@ const login = async (req, res) => {
       .select("-password -refreshToken");
 
     const options = {
-      httpOnly: true,
-      secure: true,
+      // httpOnly: true,
+      // secure: true,
     };
 
     return res
@@ -127,11 +127,11 @@ const logOutUser = async (req, res) => {
       .status(200)
       .cookie("accessToken", "", options)
       .cookie("refreshToken", "", options)
-      .json({ message: "User logged out successfully" });
+      .json({ message: "User logged out successfully." });
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "Something went wrong while logging out" });
+      .json({ error: "Something went wrong while logging out." });
   }
 };
 
@@ -141,7 +141,7 @@ const refreshAccessToken = async (req, res) => {
       req.cookies.refreshToken || req.body.refreshToken;
 
     if (!incomingRefreshToken) {
-      return res.status(401).json({ message: "Unauthorized request" });
+      return res.status(401).json({ message: "Unauthorized request." });
     }
 
     const decodedToken = jwt.verify(
@@ -152,7 +152,7 @@ const refreshAccessToken = async (req, res) => {
     const user = await userModel.findById(decodedToken?._id);
 
     if (!user || incomingRefreshToken !== user?.refreshToken) {
-      return res.status(401).json({ message: "Invalid refresh token" });
+      return res.status(401).json({ message: "Invalid refresh token." });
     }
 
     const options = {
@@ -160,7 +160,7 @@ const refreshAccessToken = async (req, res) => {
       secure: true,
     };
 
-    const { accessToken, newRefreshToken } =
+    const { accessToken, refreshToken: newRefreshToken } =
       await accessTokenAndRefreshTokenGenerator(user._id);
 
     return res
@@ -170,13 +170,22 @@ const refreshAccessToken = async (req, res) => {
       .json({
         accessToken,
         refreshToken: newRefreshToken,
-        message: "Access token refreshed successfully",
+        message: "Access token refreshed successfully.",
       });
   } catch (error) {
     return res
       .status(401)
-      .json({ message: error?.message || "Invalid refresh token" });
+      .json({ message: error?.message || "Invalid refresh token." });
   }
 };
 
-module.exports = { register, login, logOutUser, refreshAccessToken };
+const getMe = async (req, res) => {
+  try {
+    const user = req.user;
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, login, logOutUser, refreshAccessToken, getMe };

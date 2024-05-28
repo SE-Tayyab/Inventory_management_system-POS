@@ -1,8 +1,8 @@
+import { message } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ const LoginForm = () => {
     email: "",
     password: "",
   });
-  const [showAlert, setShowAlert] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
@@ -26,22 +26,22 @@ const LoginForm = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/user/login",
-        formData
+        formData,
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
-        setShowAlert(true);
         setFormData({
           email: "",
           password: "",
         });
+        message.success("Logged in succesfully");
         navigate("/");
       } else {
         throw new Error("Login failed. Please check your credentials.");
       }
     } catch (error) {
-      console.error(error);
-      setErrorMessage(error.message);
+      setErrorMessage("Username or password is not Correct");
     }
   };
 
@@ -50,15 +50,7 @@ const LoginForm = () => {
       <Row className="justify-content-md-center mt-5">
         <Col md={6}>
           <h2 className="text-center mb-4">Login</h2>
-          {showAlert && (
-            <Alert
-              variant="success"
-              onClose={() => setShowAlert(false)}
-              dismissible
-            >
-              Login successful! Welcome back.
-            </Alert>
-          )}
+
           {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formEmail" className="mt-3">
@@ -85,7 +77,12 @@ const LoginForm = () => {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" block className="mt-5">
+            <Button
+              variant="primary"
+              type="submit"
+              block="true"
+              className="mt-5"
+            >
               Login
             </Button>
           </Form>

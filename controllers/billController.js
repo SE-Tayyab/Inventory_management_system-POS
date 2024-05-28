@@ -57,4 +57,20 @@ const deleteBillController = async (req, res) => {
   }
 };
 
-module.exports = { addBillController, getBillController, deleteBillController };
+const totalAmount = async (req, res) => {
+  try {
+    const totalEarnings = await Bill.aggregate([
+      { $group: { _id: null, totalEarnings: { $sum: "$grandTotal" } } },
+    ]);
+    res.status(200).json({ totalEarnings: totalEarnings[0].totalEarnings });
+  } catch (e) {
+    res.status(500).json({ message: "internal Server error:" });
+  }
+};
+
+module.exports = {
+  addBillController,
+  getBillController,
+  deleteBillController,
+  totalAmount,
+};

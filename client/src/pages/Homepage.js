@@ -8,10 +8,12 @@ function Homepage() {
   const dispatch = useDispatch();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [amount, setAmount] = useState();
   const [selectedCategory, setSelectedCategory] = useState("All Items");
 
   useEffect(() => {
     getAllItems();
+    getTotalAmount();
   }, []);
 
   const getAllItems = async () => {
@@ -37,15 +39,39 @@ function Homepage() {
     }
   };
 
+  const getTotalAmount = async () => {
+    try {
+      dispatch({
+        type: "showLoading",
+      });
+      const totalAmount = await axios.get(
+        "http://localhost:5000/api/bills/total-earnings"
+      );
+
+      setAmount(totalAmount.data.totalEarnings);
+      dispatch({
+        type: "hideLoading",
+      });
+    } catch (e) {
+      console.log(e, "Homepage.js");
+    }
+  };
+
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
   };
 
   return (
     <DefaultComponent>
-      <div>
-        <div style={{ width: "20%" }} className="categories m-3">
-          <select onChange={handleCategoryChange} className="form-select">
+      <div
+        style={{ width: "41.5vw" }}
+        className="d-flex align-items-center justify-content-between bg-primary text-white p-3 rounded mb-4"
+      >
+        <div style={{ width: "30%" }} className="categories">
+          <select
+            onChange={handleCategoryChange}
+            className="form-select bg-light"
+          >
             <option defaultValue>All Items</option>
             {categories.map((category) => (
               <option value={category._id} key={category._id}>
@@ -53,6 +79,9 @@ function Homepage() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="total-amount fs-5">
+          Total Amount: <span className="text-warning">{amount}</span>
         </div>
       </div>
 

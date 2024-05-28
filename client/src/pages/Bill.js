@@ -71,10 +71,25 @@ const BillPage = () => {
     setPopupModel(true);
   };
 
+  const handleClearBills = async () => {
+    await axios.post("http://localhost:5000/api/bills/");
+  };
+
   return (
     <DefaultComponent>
       <div className="bill-page">
-        <h1>Bill Page</h1>
+        <div
+          style={{ width: "40.5vw" }}
+          className="d-flex align-items-center justify-content-between bg-primary text-white p-3 rounded mb-4"
+        >
+          <h1>Bills</h1>
+          <Button
+            onClick={handleClearBills}
+            className="btn btn-danger d-flex align-items-center justify-content-centor"
+          >
+            Clear all Bills
+          </Button>
+        </div>
         {loading && <Spin />}
         {error && <Alert message={error} type="error" />}
         {bills.length > 0 && (

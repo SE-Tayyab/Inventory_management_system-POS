@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Breadcrumb, Layout, Menu, message, theme } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Spinner from "./Spinner.js";
@@ -27,65 +27,6 @@ function getItem(label, key, icon, children, link) {
   };
 }
 
-const handleLogout = async () => {
-  try {
-    const response = await axios.post("http://localhost:5000/api/user/logout");
-    if (response.status === 200) {
-    } else {
-      console.error("Logout failed: ", response.statusText);
-    }
-  } catch (error) {
-    console.error("Logout failed: ", error.message);
-  }
-};
-
-const items = [
-  getItem("Home", "/", <HomeOutlined />, undefined, "/"),
-  getItem(
-    "Inventory",
-    "/inventory",
-    <UnorderedListOutlined />,
-    [
-      getItem("Items", "/items", undefined, undefined, "/items"),
-      getItem("Add Items", "/add-item", undefined, undefined, "/add-item"),
-      getItem(
-        "Add Categories",
-        "/add-categories",
-        undefined,
-        undefined,
-        "/add-categories"
-      ),
-    ],
-    ""
-  ),
-  getItem("Bills", "/bills", <CopyOutlined />, undefined, "/bills"),
-  getItem("Customers", "/customers", <UserOutlined />, undefined, "/customers"),
-  getItem("Logout", "/logout", <LogoutOutlined />),
-];
-
-const renderMenuItem = (item) => {
-  const handleClick = () => {
-    // Check if the item is for Logout
-    if (item.label === "Logout") {
-      handleLogout(); // Call the logout function
-    } else {
-      // Redirect to the specified link
-      // useNavigate.navigate(item.link);
-      <Link to={item.link}></Link>;
-    }
-  };
-
-  return item.children ? (
-    <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
-      {item.children.map((childItem) => renderMenuItem(childItem))}
-    </Menu.SubMenu>
-  ) : (
-    <Menu.Item key={item.key} icon={item.icon} onClick={handleClick}>
-      <Link to={item.link}>{item.label}</Link>
-    </Menu.Item>
-  );
-};
-
 const App = ({ children }) => {
   const { cartItems, loading } = useSelector((state) => state.rootReducer);
   const [collapsed, setCollapsed] = useState(false);
@@ -95,6 +36,80 @@ const App = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/user/logout",
+        null,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+        message.success("Logged out successfully");
+        navigate("/login");
+      } else {
+        console.error("Logout failed: ", response.statusText);
+      }
+    } catch (error) {
+      console.error("Logout failed: ", error.message);
+    }
+  };
+
+  const handleClick = (item) => {
+    if (item.label === "Logout") {
+      handleLogout();
+    } else {
+      navigate(item.link);
+    }
+  };
+
+  const items = [
+    getItem("Home", "/", <HomeOutlined />, undefined, "/"),
+    getItem(
+      "Inventory",
+      "/inventory",
+      <UnorderedListOutlined />,
+      [
+        getItem("Items", "/items", undefined, undefined, "/items"),
+        getItem("Add Items", "/add-item", undefined, undefined, "/add-item"),
+        getItem(
+          "Add Categories",
+          "/add-categories",
+          undefined,
+          undefined,
+          "/add-categories"
+        ),
+      ],
+      ""
+    ),
+    getItem("Bills", "/bills", <CopyOutlined />, undefined, "/bills"),
+    getItem(
+      "Customers",
+      "/customers",
+      <UserOutlined />,
+      undefined,
+      "/customers"
+    ),
+    getItem("Logout", "/logout", <LogoutOutlined />),
+  ];
+
+  const renderMenuItem = (item) =>
+    item.children ? (
+      <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
+        {item.children.map((childItem) => renderMenuItem(childItem))}
+      </Menu.SubMenu>
+    ) : (
+      <Menu.Item
+        key={item.key}
+        icon={item.icon}
+        onClick={() => handleClick(item)}
+      >
+        <Link to={item.link}>{item.label}</Link>
+      </Menu.Item>
+    );
 
   const {
     token: { colorBgContainer, borderRadiusLG },

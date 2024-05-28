@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
@@ -13,7 +14,6 @@ const RegistrationForm = () => {
     password: "",
   });
 
-  const [showAlert, setShowAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
@@ -31,16 +31,15 @@ const RegistrationForm = () => {
         throw new Error("Email or username already in use");
       }
 
-      // Assuming other status codes indicate registration success
-      setShowAlert(true);
       setFormData({
         username: "",
         email: "",
         password: "",
       });
+      message.success("Registered SuccessFully");
       navigate("/login");
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage("User already Registered:");
     }
   };
 
@@ -49,16 +48,7 @@ const RegistrationForm = () => {
       <Row className="justify-content-md-center mt-5">
         <Col md={6}>
           <h2 className="text-center mb-4">Registration Form</h2>
-          {showAlert && (
-            <Alert
-              variant="success"
-              onClose={() => setShowAlert(false)}
-              dismissible
-            >
-              Registration successful! Please check your email for further
-              instructions.
-            </Alert>
-          )}
+
           {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formUsername" className="mt-3">
