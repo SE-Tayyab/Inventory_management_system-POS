@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import DefaultComponent from "../components/DefaultComponent";
-import { Button, Table, Spin, Alert } from "antd";
+import { Button, Table, Spin, Alert, message } from "antd";
 import axios from "axios";
 import BillDetailsModal from "../pages/Billpage";
 
 const BillPage = () => {
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false); // New state for delete loading
   const [popupModel, setPopupModel] = useState(false);
   const [bills, setBills] = useState([]);
-  const [error, setError] = useState(null);
   const [selectedBill, setSelectedBill] = useState(null);
 
   useEffect(() => {
@@ -23,11 +23,25 @@ const BillPage = () => {
       if (response.status !== 200) {
         throw new Error("Failed to fetch bills");
       }
-      setBills(response.data.data);
+      setBills(response.data.data || []);
     } catch (error) {
-      setError("Failed to fetch bills. Please try again later.");
+      setBills([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearBills = async () => {
+    try {
+      setDeleteLoading(true); // Set delete loading state to true
+      await axios.post("http://localhost:5000/api/bills/delete-bills");
+      message.success("All bills deleted");
+      fetchBills();
+    } catch (e) {
+      console.log(e, "Bills are not deleted");
+      message.error("Failed to delete bills. Please try again later.");
+    } finally {
+      setDeleteLoading(false); // Set delete loading state to false
     }
   };
 
@@ -71,10 +85,6 @@ const BillPage = () => {
     setPopupModel(true);
   };
 
-  const handleClearBills = async () => {
-    await axios.post("http://localhost:5000/api/bills/");
-  };
-
   return (
     <DefaultComponent>
       <div className="bill-page">
@@ -91,9 +101,20 @@ const BillPage = () => {
           </Button>
         </div>
         {loading && <Spin />}
-        {error && <Alert message={error} type="error" />}
-        {bills.length > 0 && (
+        {deleteLoading && (
+          <div
+            className="d-flex align-items-center justify-content-center"
+            style={{ height: "100vh" }}
+          >
+            <Spin tip="Deleting bills..." />
+          </div>
+        )}
+
+        {/* Spinner for delete loading */}
+        {bills.length > 0 ? (
           <Table columns={columns} dataSource={bills} rowKey="_id" />
+        ) : (
+          !loading && <p className="fs-6 px-3">There are no bills.</p>
         )}
         <BillDetailsModal
           visible={popupModel}

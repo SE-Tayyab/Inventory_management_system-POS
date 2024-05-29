@@ -10,7 +10,7 @@ const {
 
 router.post("/add-bill", addBillController);
 router.get("/get-bills", getBillController);
-router.post("/delete-bill", deleteBillController);
+router.post("/delete-bills", deleteBillController);
 router.get("/total-earnings", totalAmount);
 
 module.exports = router;

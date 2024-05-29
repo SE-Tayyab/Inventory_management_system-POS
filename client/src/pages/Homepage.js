@@ -8,7 +8,7 @@ function Homepage() {
   const dispatch = useDispatch();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("All Items");
 
   useEffect(() => {

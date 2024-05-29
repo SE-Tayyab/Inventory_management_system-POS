@@ -1,4 +1,38 @@
 const Bill = require("../models/billModel");
+const nodemailer = require("nodemailer");
+
+// Configure the email transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmeil.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.USER, // sender email address
+    pass: process.env.APP_PASSWORD, // app password from gmail account
+  },
+});
+
+// Function to send email
+const sendEmail = async (totalAmount) => {
+  const mailOptions = {
+    from: {
+      name: "Tayyab Sattar",
+      address: process.env.USER,
+    }, // sender address
+    to: "tayyabsattararain@gmail.com, draz83517@gmail.com", // list of receivers
+    subject: "Bills Deletion Notification ✔", // Subject line
+    text: `All bills have been deleted. The total amount was ${totalAmount}.`, // plain text body
+    html: `<b>All bills have been deleted. The total amount was ${totalAmount}.</b>`, // html body
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Message sent: %s", info.messageId);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
 
 const addBillController = async (req, res) => {
   try {
@@ -26,8 +60,7 @@ const addBillController = async (req, res) => {
 const getBillController = async (req, res) => {
   try {
     const bills = await Bill.find();
-    console.log(bills);
-    if (!bills) {
+    if (!bills.length) {
       return res.status(404).json({ message: "No bills found." });
     }
     return res
@@ -40,18 +73,16 @@ const getBillController = async (req, res) => {
 
 const deleteBillController = async (req, res) => {
   try {
-    const { billId } = req.body;
-    console.log(billId);
-    if (!billId) {
-      return res.status(400).json({ message: "Bill ID is required." });
-    }
+    const totalEarnings = await Bill.aggregate([
+      { $group: { _id: null, totalEarnings: { $sum: "$grandTotal" } } },
+    ]);
+    const totalAmount = totalEarnings[0] ? totalEarnings[0].totalEarnings : 0;
 
-    const deletedBill = await Bill.findByIdAndDelete(billId);
-    if (!deletedBill) {
-      return res.status(404).json({ message: "Bill not found." });
-    }
+    await Bill.deleteMany({});
 
-    return res.status(200).json({ message: "Bill deleted successfully." });
+    await sendEmail(totalAmount); // Make sure to await the email sending
+
+    return res.status(200).json({ message: "All bills deleted successfully." });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error." });
   }
@@ -64,7 +95,7 @@ const totalAmount = async (req, res) => {
     ]);
     res.status(200).json({ totalEarnings: totalEarnings[0].totalEarnings });
   } catch (e) {
-    res.status(500).json({ message: "internal Server error:" });
+    res.status(500).json({ message: "Internal Server error:" });
   }
 };
 
